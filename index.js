@@ -4,10 +4,10 @@ class List {
     Это будет голова, к которой можно обращаться как ко
     всему списку.
     */
-    constructor() {
+    constructor(data = "", tail = null) {
         this.head = {
-            data: "",
-            tail: null
+            data,
+            tail
         };
     };
 
@@ -16,16 +16,14 @@ class List {
     Его хвост теперь указывает на предыдущую голову.
     */
     push(data) {
-        const tail = {
-            // Помещаем данные головы в подобный объект, сохраняя
-            data: this.head.data,
-            tail: this.head.tail
-        };
+        const tail = new List(this.head.data, this.head.tail);
+        // Вместо создания просто контейнера, создаем целый объект, который хранит предыдущие
+        // Данные головы
         this.head = {
             // Новая голова указывает на старую голову и хранит переданные данные
-            data: data,
-            tail: tail
-        }
+            data,
+            tail
+        };
     };
 
     /*
@@ -35,13 +33,10 @@ class List {
     Если нет, то просто возвращаем старую голову. 
     */
     pop() {
-        const head = {
-            data: this.head.data,
-            tail: this.head.tail
-        };
+        const head = this.head.data;
         if ( this.head.tail !== null ) {
             //Помещаем в голову её хвост, таким образом "выталкивая" её в никуда.
-            this.head = this.head.tail;
+            this.head = this.head.tail.getHead();
         }
         return head.data;
     }
@@ -50,6 +45,11 @@ class List {
     print() {
         const array = this.getArray();
         array.map((item) => console.log(item));
+    }
+
+    /* Функция выдачи "головы" */
+    getHead() {
+        return this.head;
     }
 
     /* 
@@ -64,11 +64,17 @@ class List {
         // Пока у узла, хранящегося в переменной, есть хвост, делаем
         while( node.tail !== null ) {
         // Добавляем в массив дату, хранящуюся в узле
-            array.push(node.data)
+            array.push(node.data);
         // Переменная переключается на узел, находящийся в хвосте текущей переменной
-            node = node.tail;
+            node = node.tail.getHead();
         }
         return array;
+    }
+}
+
+class ReqursiveList {
+    constructor() {
+        this.head = new List();
     }
 }
 
@@ -83,6 +89,7 @@ const renderList = function ( content, list ) {
     content.innerHTML = '';
     // Получаем массив из списка
     const array = list.getArray();
+    list.print();
     // Превращаем массив в массив узлом html
     const result = array.map((item) => {
         const li = document.createElement('li');
